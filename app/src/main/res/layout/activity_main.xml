@@ -12,7 +12,7 @@
 
               android:orientation="vertical"
 
-              tools:context="com.e_legion.coursera.MainActivity">
+              tools:context="com.example.coursera_multithreading.MainActivity">
     
     
     
