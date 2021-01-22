@@ -6,13 +6,15 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
+
+import java.util.concurrent.TimeUnit;
 
 public class ImageProcessThread extends HandlerThread {
 
+    private static final String TAG = ImageProcessThread.class.getSimpleName() + " ###== ";
+
     private static final int MESSAGE_CONVERT = 0;
-    private static final int PERCENT = 100;
-    private static final int PARTS_COUNT = 50;
-    private static final int PART_SIZE = PERCENT / PARTS_COUNT;
 
     private Handler mMainHandler;
     private Handler mBackgroundHandler;
@@ -29,82 +31,60 @@ public class ImageProcessThread extends HandlerThread {
 
     @SuppressLint("HandlerLeak")  // находимся в хендлер треде, утечки не будет
     @Override
-    protected void onLooperPrepared() {
+    protected void onLooperPrepared() {//метод аналогичный onCreate для активити, ... есть еще, конечно, конструктор
         //создаем хендлер, связанный с мейнтредом
         mMainHandler = new Handler(Looper.getMainLooper());
 
         //также создаем хендлер, связанный с текущим тредом
-        mBackgroundHandler = new Handler() {
+        mBackgroundHandler = new Handler() {//по умолчанию получает Looper текущего потока
             //и указываем ему, что делать в случае получения сообщения с нашим what значением
             // это будет выполнено в фоновом потоке
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case MESSAGE_CONVERT: {
-                        //выдергиваем битмапу и процессим ее
-                        Bitmap bitmap = (Bitmap) msg.obj;
-                        processBitmap(bitmap);
-                        msg.recycle();
+                        try {
+
+                            process();
+                            Log.d(TAG, " process done by thread: " + Thread.currentThread().getName());
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
         };
     }
 
-    private void processBitmap(final Bitmap bitmap) {
-        //бессмысленно-беспощадная долгая операция
-        //здесь я выдергиваю пиксели из битмапы
-        int h = bitmap.getHeight();
-        int w = bitmap.getWidth();
-        int[] pixels = new int[h * w];
-        bitmap.getPixels(pixels, 0, w, 0, 0, w, h);
+    private void process() throws InterruptedException {
+        for (int i = 0; i <= mCallback.getProgressMaxValue(); i++) {
+            TimeUnit.SECONDS.sleep(1);
+            //постим в мейнтред через мейнхендлер
+            final int finalI = i;
+            mMainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    // этот код уже выполняется в главном потоке
+                    mCallback.sendProgress(finalI);
+                }
+            });
 
-        // java - лайфхак - костыль - использую final массив с одной ячейкой, в которой буду менять процент.
-        // в функциональные интерфейсы мы можем передавать только финальные или эффективно финальные значения
-        // но процент у меня меняется, и я обхожу это требование
-        final int[] progress = new int[1];
-        //потом прохожусь по каждому пикселю и сдвигаю хекс значения
-        //красный на зеленый, зеленый на синий, синий на красный
-        for (int i = 0; i < h * w; i++) {
-            String hex = String.format("#%06X", (0xFFFFFF & pixels[i]));
-            String R = hex.substring(1, 3);
-            String G = hex.substring(3, 5);
-            String B = hex.substring(5);
-            String mess = B + R + G;
-            pixels[i] = Integer.parseInt(mess, 16);
-            //здесь логика показа процента готовности обработки изображения
-            //показываем PARTS_COUNT (50) кусочков в прогресс баре
-            int part = w * h / PARTS_COUNT;
-            if (i % part == 0) {
-                progress[0] = i / part * PART_SIZE; // <- костыльная магия
-                //постим в мейнтред через мейнхендлер
-                mMainHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                       // этот код уже выполняется в главном потоке
-                        mCallback.sendProgress(progress[0]);
-                    }
-                });
-            }
+            //постим в мейнтред
+            mMainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    //этот код так же исполнится в мейнтреде
+                    mCallback.onCompleted("value is:" + finalI);
+                }
+            });
         }
-
-        //создаем битмапу из пикселей с уже смещенным цветом
-        final Bitmap result = Bitmap.createBitmap(pixels, w, h, Bitmap.Config.RGB_565);
-        //постим в мейнтред
-        mMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                //этот код так же исполнится в мейнтреде
-                mCallback.onCompleted(result);
-            }
-        });
     }
 
     //этот метод будет вызываться  из главного потока
-    public void performOperation(Bitmap inputData) {
+    public void performOperation() {
         // создаем Message от BackgroundHandler'а, зааписываем в него Bitmap и отправляем в очередь
         mBackgroundHandler
-                .obtainMessage(MESSAGE_CONVERT, inputData)
+                .obtainMessage(MESSAGE_CONVERT)
                 .sendToTarget();
         // созданное сообщение попадает в очередь фонового потока,
         // так как хендлер связан с лупером фонового потока
@@ -114,7 +94,8 @@ public class ImageProcessThread extends HandlerThread {
 
     public interface Callback {
         void sendProgress(int progress);
-        void onCompleted(Bitmap bitmap);
+        void onCompleted(String string);
+        int getProgressMaxValue();
     }
 
 }
