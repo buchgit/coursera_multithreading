@@ -3,6 +3,9 @@ package com.example.coursera_multithreading;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.Message;
+import android.util.Log;
+import androidx.annotation.NonNull;
 
 /*
 1. В треде должно быть поле хэндлера
@@ -14,12 +17,19 @@ import android.os.Looper;
 то тогда поле для хранения активити в данном классе можно сделать типа CallbackActivity
 и создать сеттер для этого поля
 
+можно инициализировать хэндлер в onLooperPrepared(), но эксперимент показал, что иногда функция onLooperPrepared()
+вызывается позже, чем метод postTask, а значит при выполнении этой функции хэндлер равен null
+если же пользоваться вызовом handler через свой метод prepareHandler(), то postTask - всегда после определения хэндлера
+
+Если дать задержку (в коде = 1 сек) после onLooperPrepared() , то тогда программа не крэшится.
  */
 
 public class MyHandlerThread extends HandlerThread {
 
+    private final String TAG = MyHandlerThread.class.getSimpleName() + " ###== ";
     private Handler handler;
     private CallbackActivity activity;
+    public static final int HANDLER_TAG = 1;
 
     public MyHandlerThread(String name) {
         super(name);
@@ -33,8 +43,8 @@ public class MyHandlerThread extends HandlerThread {
     @Override
     protected void onLooperPrepared() {
         super.onLooperPrepared();
-        //можно инициализировать хэндлер здесь
         handler = new Handler(getLooper());
+        Log.d(TAG, "onLooperPrepared: handler.hashCode() " +handler.hashCode());
 
     }
 
@@ -48,11 +58,21 @@ public class MyHandlerThread extends HandlerThread {
     //собственно добавленные функции
     //НО лучше инициализировать хэндлер в отдельной процедуре
     public void prepareHandler(){
-        handler = new Handler(getLooper());
+        handler = new Handler(getLooper()){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                if (msg.what == HANDLER_TAG){
+                    activity.setText("THREAD " + Thread.currentThread().getName() + " made HANDLER_TAG");
+                    Log.d(TAG, "THREAD \" + Thread.currentThread().getName() + \" made HANDLER_TAG");
+                }
+            }
+        };
+        Log.d(TAG, "prepareHandler: handler.hashCode() " +handler.hashCode());
     }
 
     //работа с местным хэндлером
     public void postTask(Runnable task){
+        Log.d(TAG, "postTask handler.hashCode() in use "+handler.hashCode());
         handler.post(task);
     }
 

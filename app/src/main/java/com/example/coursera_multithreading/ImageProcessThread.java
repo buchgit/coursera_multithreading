@@ -1,7 +1,6 @@
 package com.example.coursera_multithreading;
 
 import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;

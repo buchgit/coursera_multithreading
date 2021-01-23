@@ -53,10 +53,27 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
                 //здесь поработаем с потоком MyHandlerThread
                 myHandlerThread = new MyHandlerThread("my_tread");
                 myHandlerThread.start();//запускаем, иначе ни хэндлера, ни лупера не получим
-                myHandlerThread.prepareHandler();//создали хэндлер с привязанным к нему лупером
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //myHandlerThread.prepareHandler();//создали хэндлер с привязанным к нему лупером
                 myHandlerThread.postTask(hardTask);//передаем задачу в фоновый поток
+
+                myHandlerThread.prepareHandler();
                 myHandlerThread.setActivity(MainActivity.this);//можно передеть текущую активити в поток, для работы с ее элементами
                 myHandlerThread.setTextView("Hi, people!");
+
+                //даем паузу
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                myHandlerThread.getHandler().obtainMessage(MyHandlerThread.HANDLER_TAG).sendToTarget();
+
             }
 
         });
