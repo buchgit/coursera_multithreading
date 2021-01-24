@@ -1,6 +1,8 @@
 package com.example.coursera_multithreading;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
     private MyHandlerThread myHandlerThread;
     public static final int MAX = 30;
     private Button btnMessage;
+    private MyHandlerThread myHandlerThread_2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,10 +75,18 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
                     e.printStackTrace();
                 }
 
+                //создаем хэндлер через собственную функцию getHandler()
                 myHandlerThread.getHandler().obtainMessage(MyHandlerThread.HANDLER_TAG).sendToTarget();
 
-            }
+//                MyHandlerThread myThread = new MyHandlerThread(TAG);
+//                Handler h = myThread.getThreadHandler();                      //почему метод  getThreadHandler() недоступен?
 
+                //здесь из ui- потока закинем задачу в другой фоновый поток
+                myHandlerThread_2 = new MyHandlerThread("my_thread_2");
+                myHandlerThread_2.start();
+                Handler handler = new Handler(myHandlerThread_2.getLooper());//получили хэндлер, привязанный к луперу фонового потока
+                handler.post(hardTask);
+            }
         });
     }
 
@@ -94,9 +105,15 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
     @Override
     protected void onDestroy() {
         //гасим фоновый поток, не мусорим
+        String tname = mImageProcessThread.getName();
         mImageProcessThread.quit();
+        Log.d(TAG, "onDestroy: quit: " + tname);
         //гасим поток myHandlerThread
+        tname = myHandlerThread.getName();
         myHandlerThread.quit();
+        Log.d(TAG, "onDestroy: quit: " + tname);
+        myHandlerThread_2.quit();
+
         super.onDestroy();
     }
 
@@ -111,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
                     e.printStackTrace();
                 }
             }
-            Log.d(TAG, "job thread is: "+ Thread.currentThread().getName());
+            Log.d(TAG, "hardTask is done by thread: "+Thread.currentThread().getName() + "; hashCode: " + Thread.currentThread().hashCode());
         }
     };
 
@@ -127,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
 
     public void onClickMessage(View view){
         if (view.getId() == R.id.btn_message){
-            setText("fine,fine,fine...button is not blocked");
+            setText("fine...button is not blocked");
         }
     }
 }

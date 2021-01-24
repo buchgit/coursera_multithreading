@@ -45,7 +45,7 @@ public class ImageProcessThread extends HandlerThread {
                         try {
 
                             process();
-                            Log.d(TAG, " process done by thread: " + Thread.currentThread().getName());
+                            Log.d(TAG, " process done by thread: "+Thread.currentThread().getName() + "; hashCode: " + Thread.currentThread().hashCode());
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

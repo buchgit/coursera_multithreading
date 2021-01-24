@@ -7,6 +7,8 @@ import android.os.Message;
 import android.util.Log;
 import androidx.annotation.NonNull;
 
+import java.util.concurrent.TimeUnit;
+
 /*
 1. В треде должно быть поле хэндлера
 2. Создать хэндлер, привязать к луперу треда через метод getLooper()
@@ -28,6 +30,7 @@ public class MyHandlerThread extends HandlerThread {
 
     private final String TAG = MyHandlerThread.class.getSimpleName() + " ###== ";
     private Handler handler;
+    private Handler ui_handler; //хэндлер главного потока
     private CallbackActivity activity;
     public static final int HANDLER_TAG = 1;
 
@@ -44,16 +47,36 @@ public class MyHandlerThread extends HandlerThread {
     protected void onLooperPrepared() {
         super.onLooperPrepared();
         handler = new Handler(getLooper());
+        ui_handler = new Handler(Looper.getMainLooper());
         Log.d(TAG, "onLooperPrepared: handler.hashCode() " +handler.hashCode());
 
     }
 
     //здесь поместить код , который выполняет тред
+    //run Before отрабатывает, а run After - нет
+    //если разместить код перед super.run() - дает ошибку
+    //в super.run()  создается Looper этого треда, поэтому run() переопределять нельзя, видимо
     @Override
     public void run() {
+        Log.d(TAG, "run Before: ***********");
         super.run();
-
+        Log.d(TAG, "run After: ***********");
+        //этот код не отрабатывает
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                activity.setText("runnable from run of thread");
+                try {
+                    TimeUnit.SECONDS.sleep(3);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
+
+    //Вопрос: почему не отрабатывает метод getThreadHandler() класса HendlerThread
+    //который должен возвращать хэндлер, привязанный к потоку
 
     //собственно добавленные функции
     //НО лучше инициализировать хэндлер в отдельной процедуре
@@ -62,8 +85,8 @@ public class MyHandlerThread extends HandlerThread {
             @Override
             public void handleMessage(@NonNull Message msg) {
                 if (msg.what == HANDLER_TAG){
-                    activity.setText("THREAD " + Thread.currentThread().getName() + " made HANDLER_TAG");
-                    Log.d(TAG, "THREAD \" + Thread.currentThread().getName() + \" made HANDLER_TAG");
+                    activity.setText("THREAD.hashCode " + Thread.currentThread().hashCode() + " made HANDLER_TAG");
+                    Log.d(TAG, "THREAD.hashCode " + Thread.currentThread().hashCode() + " made HANDLER_TAG, handler.hashCode:"+ handler.hashCode());
                 }
             }
         };
@@ -74,12 +97,18 @@ public class MyHandlerThread extends HandlerThread {
     public void postTask(Runnable task){
         Log.d(TAG, "postTask handler.hashCode() in use "+handler.hashCode());
         handler.post(task);
+        ui_handler.post(task);
     }
 
     //можно хэндлер отдавать через get()
     public Handler getHandler() {
+//        if (handler==null){
+//            return new Handler(getLooper());
+//        };
         return handler;
     }
+
+
 
     //работаем с элементом активити
     void setTextView(String text){
@@ -96,4 +125,5 @@ public class MyHandlerThread extends HandlerThread {
     public void setActivity(CallbackActivity activity) {
         this.activity = activity;
     }
+
 }
