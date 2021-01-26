@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
     public static final int MAX = 30;
     private Button btnMessage;
     private MyHandlerThread myHandlerThread_2;
+    private LooperThread looperThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +87,19 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
                 myHandlerThread_2.start();
                 Handler handler = new Handler(myHandlerThread_2.getLooper());//получили хэндлер, привязанный к луперу фонового потока
                 handler.post(hardTask);
+
+                //use LooperThread class
+                looperThread = new LooperThread();
+                looperThread.start();
+                //без задержки хэндлер не отрабатывает
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Handler looperThreadHandler = looperThread.getHandler();
+                looperThreadHandler.obtainMessage(LooperThread.LOOPER_THREAD_MESSAGE).sendToTarget();
+
             }
         });
     }
