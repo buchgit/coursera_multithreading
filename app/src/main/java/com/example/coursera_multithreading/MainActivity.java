@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
     private LooperThread looperThread;
 
     public static final int MESSAGE_1 = 0;
+    public static final int MESSAGE_2 = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
                 //use LooperThread class
                 looperThread = new LooperThread();
                 looperThread.start();
+                looperThread.setActivity(MainActivity.this);
                 //без задержки хэндлер не отрабатывает
                 try {
                     TimeUnit.SECONDS.sleep(1);
@@ -103,10 +105,23 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
                 Handler looperThreadHandler = looperThread.getHandler();
                 looperThreadHandler.obtainMessage(LooperThread.LOOPER_THREAD_MESSAGE,"hello from LooperThread").sendToTarget();
 
+                //без задержки не отрабатывает
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 //из главной активити посылаем сообщение в фоновый поток и там исполняем
                 Message msg = new Message();
                 msg.what = MESSAGE_1;
                 looperThreadHandler.obtainMessage(MESSAGE_1,"hello from MainActivity by LooperThread").sendToTarget();
+
+                //запускаем выполнение в определенное время
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_2;
+                msg2.obj = "is done MESSAGE_2";
+
+                looperThreadHandler.sendMessageAtTime(msg2,2000);
 
                 //run with UI thread
                 runOnUiThread(hardTask);

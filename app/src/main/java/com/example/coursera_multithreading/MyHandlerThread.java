@@ -53,29 +53,30 @@ public class MyHandlerThread extends HandlerThread {
     }
 
     //здесь поместить код , который выполняет тред
-    //run Before отрабатывает, а run After - нет
     //если разместить код перед super.run() - дает ошибку
     //в super.run()  создается Looper этого треда, поэтому run() переопределять нельзя, видимо
     @Override
     public void run() {
         Log.d(TAG, "run Before: ***********");
         super.run();
-        Log.d(TAG, "run After: ***********");
+        try {
+            TimeUnit.SECONDS.sleep(3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         //этот код не отрабатывает
         handler.post(new Runnable() {
             @Override
             public void run() {
-                activity.setText("runnable from run of thread");
-                try {
-                    TimeUnit.SECONDS.sleep(3);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                activity.setText("runnable from run of MyHandlerThread");
+                Log.d(TAG, " *********** runnable from run of MyHandlerThread");
+
             }
         });
+        Log.d(TAG, "run After: ***********");
     }
 
-    //Вопрос: почему не отрабатывает метод getThreadHandler() класса HendlerThread
+    //Вопрос: почему не отрабатывает метод getThreadHandler() класса HandlerThread
     //который должен возвращать хэндлер, привязанный к потоку
 
     //собственно добавленные функции
