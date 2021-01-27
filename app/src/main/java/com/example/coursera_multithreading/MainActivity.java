@@ -3,6 +3,7 @@ package com.example.coursera_multithreading;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,8 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
     private Button btnMessage;
     private MyHandlerThread myHandlerThread_2;
     private LooperThread looperThread;
+
+    public static final int MESSAGE_1 = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +101,15 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
                     e.printStackTrace();
                 }
                 Handler looperThreadHandler = looperThread.getHandler();
-                looperThreadHandler.obtainMessage(LooperThread.LOOPER_THREAD_MESSAGE).sendToTarget();
+                looperThreadHandler.obtainMessage(LooperThread.LOOPER_THREAD_MESSAGE,"hello from LooperThread").sendToTarget();
+
+                //из главной активити посылаем сообщение в фоновый поток и там исполняем
+                Message msg = new Message();
+                msg.what = MESSAGE_1;
+                looperThreadHandler.obtainMessage(MESSAGE_1,"hello from MainActivity by LooperThread").sendToTarget();
+
+                //run with UI thread
+                runOnUiThread(hardTask);
 
             }
         });

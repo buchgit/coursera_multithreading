@@ -7,6 +7,8 @@ import android.os.Message;
 import android.util.Log;
 import androidx.annotation.NonNull;
 
+import java.util.concurrent.TimeUnit;
+
 public class LooperThread extends Thread{
 
     private final String TAG = Looper.class.getSimpleName() + " ###== ";
@@ -22,10 +24,17 @@ public class LooperThread extends Thread{
         handler = new Handler() {
             @Override
             public void handleMessage(@NonNull Message msg) {
-                if (msg.what == LOOPER_THREAD_MESSAGE) {
-                    Log.d(TAG, "run() in LooperThread");
-
+                switch (msg.what){
+                    case LOOPER_THREAD_MESSAGE:
+                        Log.d(TAG, "run() in LooperThread");
+                        handler.post(hardTaskLooperThreadClass);
+                        break;
+                    case MainActivity.MESSAGE_1:
+                        Log.d(TAG, "run() in LooperThread msg = "+ msg.obj);
+                        break;
+                    default:break;
                 }
+
             }
         };
         Looper.loop();
@@ -34,5 +43,20 @@ public class LooperThread extends Thread{
     public Handler getHandler() {
         return handler;
     }
+
+    Runnable hardTaskLooperThreadClass = new Runnable() {
+        @Override
+        public void run() {
+            for (int i=0;i<10;i++){
+                try {
+                    TimeUnit.MILLISECONDS.sleep(500);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            Log.d(TAG, "hardTaskLooperThreadClass is done by thread: "+Thread.currentThread().getName() + "; hashCode: " + Thread.currentThread().hashCode());
+        }
+    };
 
 }
