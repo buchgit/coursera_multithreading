@@ -20,7 +20,7 @@ import android.widget.*;
  * and send back the image to the Activity using
  * the {@link #uiHandler} given to the {@link #workerThread}
  *
- * The Activity implement {@link com.tinmegali.hamer.WorkerThread.Callback}
+ * The Activity implement {@link com.example.coursera_multithreading.WorkerThread.Callback}
  * a callback that gives UI methods to the UI Thread.
  * Although those methods can only be accessed by posting
  * a {@link Runnable} using the {@link Handler} sent to the bg thread
