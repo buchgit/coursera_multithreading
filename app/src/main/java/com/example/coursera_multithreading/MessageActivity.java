@@ -8,11 +8,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
+
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
-import com.tinmegali.hamer.util.BaseActivity;
+
 
 /**
  * Activity that illustrate the use of {@link android.os.Message} objects.
