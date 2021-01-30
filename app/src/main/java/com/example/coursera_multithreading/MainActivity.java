@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
 
     //весь код ниже выполняется в мейнтреде
     private TextView textView;
+    private TextView textView2;
     private ProgressBar mProgressBar;
     private ImageProcessThread mImageProcessThread;
     private MyHandlerThread myHandlerThread;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
 
     public static final String PROGRESS_VALUE = "progress bar value";//ключ для сохранения значения прогресса в RetainedFragment
     public static final String TEXT_VIEW_TEXT = "text of textView";
+    public static final String TEXT_VIEW_TEXT_2 = "text on textView 2";
 
     private RetainedFragment retainedFragment;//для сохранения данных при уничтожении активити
 
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
 
         final Button performBtn = findViewById(R.id.btn_perform);
         textView = findViewById(R.id.tv_main);
+        textView2 = findViewById(R.id.tv_main_2);
         mProgressBar = findViewById(R.id.progress);
         mProgressBar.setMax(MAX);
         btnMessage = findViewById(R.id.btn_message);
@@ -49,10 +52,14 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
         startRetainedFrag();//запускаем/восстанавливаем RetainedFragment для/или сохраненными данными
 
         String text = (String)retainedFragment.getObject(TEXT_VIEW_TEXT);
+        String text2 = (String)retainedFragment.getObject(TEXT_VIEW_TEXT_2);
         Integer progress = (Integer)retainedFragment.getObject(PROGRESS_VALUE);
 
         if (text != null) {
             textView.setText(text);
+        }
+        if (text2 != null) {
+            textView2.setText(text2);
         }
         if (progress != null) {
             mProgressBar.setProgress(progress);
@@ -171,9 +178,9 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
         Log.d(TAG, "onDestroy: quit: " + tname);
         //гасим поток myHandlerThread
         tname = myHandlerThread.getName();
-        myHandlerThread.quit();
+        //myHandlerThread.quit();
         Log.d(TAG, "onDestroy: quit: " + tname);
-        myHandlerThread_2.quit();
+        //myHandlerThread_2.quit();
 
         super.onDestroy();
     }
@@ -237,10 +244,13 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
             //запускаем поток и инициализируем Looper
             mImageProcessThread.start();
             mImageProcessThread.getLooper();  // -> вызовется onLooperPrepared()
-            mImageProcessThread.setCallback(this); //because MainActivity implements Callback interface
         }
+        mImageProcessThread.setCallback(this); //because MainActivity implements Callback interface
         myHandlerThread = (MyHandlerThread) retainedFragment.getObject(MyHandlerThread.TAG);
         looperThread = (LooperThread) retainedFragment.getObject(LooperThread.TAG);
+        if (looperThread != null) {
+            looperThread.setActivity(this);
+        }
     }
 
 }

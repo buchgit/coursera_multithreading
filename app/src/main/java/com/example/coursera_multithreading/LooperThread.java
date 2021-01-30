@@ -69,6 +69,4 @@ public class LooperThread extends Thread{
         }
     };
 
-
-
 }
