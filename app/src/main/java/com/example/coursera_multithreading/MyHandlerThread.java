@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MyHandlerThread extends HandlerThread {
 
-    private final String TAG = MyHandlerThread.class.getSimpleName() + " ###== ";
+    public static final String TAG = MyHandlerThread.class.getSimpleName() + " ###== ";
     private Handler handler;
     private Handler ui_handler; //хэндлер главного потока
     private CallbackActivity activity;

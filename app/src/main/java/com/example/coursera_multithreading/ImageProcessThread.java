@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ImageProcessThread extends HandlerThread {
 
-    private static final String TAG = ImageProcessThread.class.getSimpleName() + " ###== ";
+    public static final String TAG = ImageProcessThread.class.getSimpleName() + " ###== ";
 
     private static final int MESSAGE_CONVERT = 0;
 

@@ -22,13 +22,18 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
     private ProgressBar mProgressBar;
     private ImageProcessThread mImageProcessThread;
     private MyHandlerThread myHandlerThread;
-    public static final int MAX = 30;
+    public static final int MAX = 100;
     private Button btnMessage;
     private MyHandlerThread myHandlerThread_2;
     private LooperThread looperThread;
 
     public static final int MESSAGE_1 = 0;
     public static final int MESSAGE_2 = 1;
+
+    public static final String PROGRESS_VALUE = "progress bar value";//ключ для сохранения значения прогресса в RetainedFragment
+    public static final String TEXT_VIEW_TEXT = "text of textView";
+
+    private RetainedFragment retainedFragment;//для сохранения данных при уничтожении активити
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,12 +46,28 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
         mProgressBar.setMax(MAX);
         btnMessage = findViewById(R.id.btn_message);
 
-        //создаем новый экземпляр фонового потока потока
-        mImageProcessThread = new ImageProcessThread("Background ");
-        //запускаем поток и инициализируем Looper
-        mImageProcessThread.start();
-        mImageProcessThread.getLooper();  // -> вызовется onLooperPrepared()
-        mImageProcessThread.setCallback(this); //because MainActivity implements Callback interface
+        startRetainedFrag();//запускаем/восстанавливаем RetainedFragment для/или сохраненными данными
+
+        String text = (String)retainedFragment.getObject(TEXT_VIEW_TEXT);
+        Integer progress = (Integer)retainedFragment.getObject(PROGRESS_VALUE);
+
+        if (text != null) {
+            textView.setText(text);
+        }
+        if (progress != null) {
+            mProgressBar.setProgress(progress);
+        }
+
+        //создаем/восстанавливаем фоновые потоки
+        recoveryThreads();
+//
+//        //создаем новый экземпляр фонового потока
+//        mImageProcessThread = new ImageProcessThread("Background ");
+//        //запускаем поток и инициализируем Looper
+//        mImageProcessThread.start();
+//        mImageProcessThread.getLooper();  // -> вызовется onLooperPrepared()
+//        mImageProcessThread.setCallback(this); //because MainActivity implements Callback interface
+
         //теперь в фоновом потоке будет крутиться лупер и ждать задач
         performBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -146,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
     protected void onDestroy() {
         //гасим фоновый поток, не мусорим
         String tname = mImageProcessThread.getName();
-        mImageProcessThread.quit();
+        //mImageProcessThread.quit();
         Log.d(TAG, "onDestroy: quit: " + tname);
         //гасим поток myHandlerThread
         tname = myHandlerThread.getName();
@@ -155,6 +176,16 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
         myHandlerThread_2.quit();
 
         super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        retainedFragment.putObject(PROGRESS_VALUE,mProgressBar.getProgress());
+        retainedFragment.putObject(TEXT_VIEW_TEXT,textView.getText().toString());
+        retainedFragment.putObject(ImageProcessThread.TAG,mImageProcessThread);
+        retainedFragment.putObject(MyHandlerThread.TAG,myHandlerThread);
+        retainedFragment.putObject(LooperThread.TAG,looperThread);
     }
 
     Runnable hardTask = new Runnable() {
@@ -187,4 +218,29 @@ public class MainActivity extends AppCompatActivity implements ImageProcessThrea
             setText("fine...button is not blocked");
         }
     }
+
+    private void startRetainedFrag (){
+        //RetainedFragment retainedFragment = (RetainedFragment) getFragmentManager().findFragmentByTag(RetainedFragment.TAG);
+        retainedFragment = (RetainedFragment) getFragmentManager().findFragmentByTag(RetainedFragment.TAG);
+        if (retainedFragment==null){
+            retainedFragment = new RetainedFragment();
+            getFragmentManager().beginTransaction().add(retainedFragment,RetainedFragment.TAG).commit();
+        }
+    }
+
+    private void recoveryThreads(){
+        mImageProcessThread = (ImageProcessThread) retainedFragment.getObject(ImageProcessThread.TAG);
+        if (mImageProcessThread==null) {
+
+            //создаем новый экземпляр фонового потока
+            mImageProcessThread = new ImageProcessThread("Background ");
+            //запускаем поток и инициализируем Looper
+            mImageProcessThread.start();
+            mImageProcessThread.getLooper();  // -> вызовется onLooperPrepared()
+            mImageProcessThread.setCallback(this); //because MainActivity implements Callback interface
+        }
+        myHandlerThread = (MyHandlerThread) retainedFragment.getObject(MyHandlerThread.TAG);
+        looperThread = (LooperThread) retainedFragment.getObject(LooperThread.TAG);
+    }
+
 }

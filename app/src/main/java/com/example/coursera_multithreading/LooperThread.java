@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class LooperThread extends Thread{
 
-    private final String TAG = Looper.class.getSimpleName() + " ###== ";
+    public static final String TAG = Looper.class.getSimpleName() + " ###== ";
     public static final int LOOPER_THREAD_MESSAGE = 10;
     private WeakReference <MainActivity> weakReference_activity;
 
