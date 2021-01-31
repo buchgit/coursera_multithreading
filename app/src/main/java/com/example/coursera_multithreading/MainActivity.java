@@ -38,7 +38,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         initUI();
 
         //id = 1, bundle = null, context = this
-        getSupportLoaderManager().initLoader(LOADER_WITH_THREAD,null,this);
+        //getSupportLoaderManager().initLoader(LOADER_WITH_THREAD,null,this);
+
+        for (int i = 0 ;i<5;i++){
+            getSupportLoaderManager().restartLoader(LOADER_WITH_THREAD,null,this);
+        }
 
     }
 
