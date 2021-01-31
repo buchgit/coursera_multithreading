@@ -1,7 +1,6 @@
 package com.example.coursera_multithreading;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -10,26 +9,20 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.AsyncTaskLoader;
+import androidx.loader.content.Loader;
+
+import java.util.concurrent.TimeUnit;
 
 /*
-Сохраняем данные в Bundle, при смене активити достаем из Bundle
-Если компонентам присвоен id (для TextView, кнопок и т.п.), то о сохранении заботиться система, ничего делать не нужно //ЭТО НЕ РАБОТАЕТ
-Если сохранить нужно свои объекты, то придется заботиться самому
-
-ВАЖНО: нужно использовать метод с ОДНИМ параметром
-protected void onSaveInstanceState(@NonNull Bundle outState) {...}
-так как есть похожий метод с ДВУМЯ параметрами
-public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {...}
-, с ним не будет работать сохранение при смене активити (например, повороте)
-
-Сохранение ссылки на объект, которую можно передать в новую активити
+через Loader запускается и выполняется 10 сек задача. При этом не блокируется работа кнопок.
  */
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String> {
 
     private final String TAG = MainActivity.class.getSimpleName() + " ###== ";
-
-    public final String MY_OBJECT = "my object";
+    private final int LOADER_WITH_THREAD = 1;
 
     Button buttonPerform;
     Button buttonMessage;
@@ -37,27 +30,15 @@ public class MainActivity extends AppCompatActivity  {
     TextView textView;
     ProgressBar progressBar;
 
-    MyObject myObject;
-    MyObject myObject2;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        myObject = new MyObject();
-
-        if (myObject2 == null) {
-            myObject2 = (MyObject) getLastCustomNonConfigurationInstance();
-            if (myObject2 == null) {
-                myObject2 = new MyObject();
-                Log.d(TAG, " new myObject 2 hashCode" + myObject2.hashCode());
-            }else {
-                Log.d(TAG, " restored myObject 2 hashCode" + myObject2.hashCode());
-            }
-        }
-
         initUI();
+
+        //id = 1, bundle = null, context = this
+        getSupportLoaderManager().initLoader(LOADER_WITH_THREAD,null,this);
 
     }
 
@@ -82,32 +63,53 @@ public class MainActivity extends AppCompatActivity  {
         progressBar = findViewById(R.id.pr_bar);
     }
 
+
+    @NonNull
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        Log.d(TAG, "1/onSaveInstanceState: ");
-        outState.putSerializable(MY_OBJECT, myObject);
-        super.onSaveInstanceState(outState);
-        Log.d(TAG, "2/onSaveInstanceState: ");
+    public Loader<String> onCreateLoader(int id, @Nullable Bundle args) {
+        return new AsyncTaskLoader<String>(this) {
+            @Nullable
+            @Override
+            public String loadInBackground() {
+                //Think of this as AsyncTask doInBackground() method,
+                // here you will actually initiate Network call,
+                // or any work that need to be done on background
+                Thread thread = new Thread(hardTask);
+                thread.start();
+                Log.d(TAG, "loadInBackground: ");
+                return null;
+            }
+
+            @Override
+            protected void onStartLoading() {
+                //Think of this as AsyncTask onPreExecute() method,
+                // you can start your progress bar,and at the end call forceLoad();
+                Log.d(TAG, "onStartLoading: ");
+                forceLoad();
+            }
+        };
     }
 
     @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        Log.d(TAG, "1/onRestoreInstanceState: ");
-        super.onRestoreInstanceState(savedInstanceState);
-        if (savedInstanceState!=null){
-            myObject = (MyObject) savedInstanceState.getSerializable(MY_OBJECT);
-            textView.setText(myObject.TAG);
-            Log.d(TAG, "2/onRestoreInstanceState: ");
+    public void onLoadFinished(@NonNull Loader<String> loader, String data) {
+        Log.d(TAG, "onLoadFinished: ");
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<String> loader) {
+        Log.d(TAG, "onLoaderReset: ");
+    }
+
+    Runnable hardTask = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                Log.d(TAG, "start: hardTask");
+                TimeUnit.SECONDS.sleep(10);
+                Log.d(TAG, "finish: hardTask");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        Log.d(TAG, "3/onRestoreInstanceState: ");
-    }
-
-    @Nullable
-    @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        return myObject2;
-    }
-
-
-
+    };
 }
