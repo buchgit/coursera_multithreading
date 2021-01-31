@@ -21,6 +21,8 @@ protected void onSaveInstanceState(@NonNull Bundle outState) {...}
 так как есть похожий метод с ДВУМЯ параметрами
 public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {...}
 , с ним не будет работать сохранение при смене активити (например, повороте)
+
+Сохранение ссылки на объект, которую можно передать в новую активити
  */
 
 public class MainActivity extends AppCompatActivity  {
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity  {
     ProgressBar progressBar;
 
     MyObject myObject;
+    MyObject myObject2;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,9 +47,17 @@ public class MainActivity extends AppCompatActivity  {
 
         myObject = new MyObject();
 
+        if (myObject2 == null) {
+            myObject2 = (MyObject) getLastCustomNonConfigurationInstance();
+            if (myObject2 == null) {
+                myObject2 = new MyObject();
+                Log.d(TAG, " new myObject 2 hashCode" + myObject2.hashCode());
+            }else {
+                Log.d(TAG, " restored myObject 2 hashCode" + myObject2.hashCode());
+            }
+        }
+
         initUI();
-
-
 
     }
 
@@ -91,8 +102,12 @@ public class MainActivity extends AppCompatActivity  {
         Log.d(TAG, "3/onRestoreInstanceState: ");
     }
 
+    @Nullable
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
+    public Object onRetainCustomNonConfigurationInstance() {
+        return myObject2;
     }
+
+
+
 }
