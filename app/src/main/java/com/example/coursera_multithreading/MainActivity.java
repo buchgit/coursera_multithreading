@@ -6,17 +6,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.AsyncTaskLoader;
-import androidx.loader.content.Loader;
 
 import java.util.concurrent.TimeUnit;
 
 /*
-через Loader запускается и выполняется 10 сек задача. При этом не блокируется работа кнопок.
+Урок 101.
+Создаем свой ContentProvider
+
+Uri можно представить в таком виде: content://<authority>/<path>/<id>
+
+
  */
 
 public class MainActivity extends AppCompatActivity {
