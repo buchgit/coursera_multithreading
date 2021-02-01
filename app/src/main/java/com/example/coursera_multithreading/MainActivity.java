@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 через Loader запускается и выполняется 10 сек задача. При этом не блокируется работа кнопок.
  */
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String> {
+public class MainActivity extends AppCompatActivity {
 
     private final String TAG = MainActivity.class.getSimpleName() + " ###== ";
     private final int LOADER_WITH_THREAD = 1;
@@ -37,12 +37,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         initUI();
 
-        //id = 1, bundle = null, context = this
-        //getSupportLoaderManager().initLoader(LOADER_WITH_THREAD,null,this);
 
-        for (int i = 0 ;i<5;i++){
-            getSupportLoaderManager().restartLoader(LOADER_WITH_THREAD,null,this);
-        }
+
+
 
     }
 
@@ -68,41 +65,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
 
-    @NonNull
-    @Override
-    public Loader<String> onCreateLoader(int id, @Nullable Bundle args) {
-        return new AsyncTaskLoader<String>(this) {
-            @Nullable
-            @Override
-            public String loadInBackground() {
-                //Think of this as AsyncTask doInBackground() method,
-                // here you will actually initiate Network call,
-                // or any work that need to be done on background
-                Thread thread = new Thread(hardTask);
-                thread.start();
-                Log.d(TAG, "loadInBackground: ");
-                return null;
-            }
-
-            @Override
-            protected void onStartLoading() {
-                //Think of this as AsyncTask onPreExecute() method,
-                // you can start your progress bar,and at the end call forceLoad();
-                Log.d(TAG, "onStartLoading: ");
-                forceLoad();
-            }
-        };
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<String> loader, String data) {
-        Log.d(TAG, "onLoadFinished: ");
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<String> loader) {
-        Log.d(TAG, "onLoaderReset: ");
-    }
 
     Runnable hardTask = new Runnable() {
         @Override
