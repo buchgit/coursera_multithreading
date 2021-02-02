@@ -10,7 +10,20 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.sql.PreparedStatement;
+/*
+Константы провайдера
+В приложении мы создали константы, и поместили туда значения из провайдера. Получился хардкод.
+А правильнее было бы использовать эти константы прямо из класса провайдера.
+Для этого создателю провайдера можно выделить все необходимые константы в отдельный класс,
+создать из него библиотеку .jar и распространять ее. Разработчики добавят ее в свой проект,
+и смогут оттуда использовать все необходимые им константы для работы с провайдером.
+
+Метод: getWritableDatabase
+Метод getWritableDatabase по причинам производительности не рекомендуется
+вызывать в onCreate методе провайдера. Поэтому мы в onCreate только создавали DBHelper,
+а в методах query, insert и прочих вызывали getWritableDatabase() и получали доступ к БД.
+
+ */
 
 public class MyContentProvider extends ContentProvider {
 
