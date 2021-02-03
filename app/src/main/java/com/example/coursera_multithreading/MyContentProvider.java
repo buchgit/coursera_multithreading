@@ -10,6 +10,10 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /*
 Константы провайдера
 В приложении мы создали константы, и поместили туда значения из провайдера. Получился хардкод.
@@ -22,6 +26,13 @@ import androidx.annotation.Nullable;
 Метод getWritableDatabase по причинам производительности не рекомендуется
 вызывать в onCreate методе провайдера. Поэтому мы в onCreate только создавали DBHelper,
 а в методах query, insert и прочих вызывали getWritableDatabase() и получали доступ к БД.
+
+https://habr.com/ru/post/125883/
+пишут,что вариант создания ссылки db является баговым. Нужно как миниму делать db.close()
+db = dbHelper.getWritableDatabase();
+db.insert(...)
+лучше без создания ссылки, вроде этого:
+dbHelper.getWritableDatabase().insert(...)
 
  */
 
@@ -44,7 +55,7 @@ public class MyContentProvider extends ContentProvider {
             + CONTACT_EMAIL + " text);";
 
     //authority
-    private static final String  AUTHORITY = "com.example.coursera_multithreading.provider.AddressBook";
+    private static final String  AUTHORITY = "com.example.coursera_multithreading.MyContentProvider";
     //path
     private static final String CONTACT_PATH = "contacts";//same as contact table in this sample
     //Uri //пригодится для получения уведомлений об изменении в данном uri
@@ -89,9 +100,9 @@ public class MyContentProvider extends ContentProvider {
         switch (uriMatcher.match(uri)){
             case URI_CONTACTS:
                 Log.d(TAG, "query: URI_CONTACTS");
-                if (sortOrder.isEmpty()){
-                    sortOrder = CONTACT_NAME + " ASC";
-                }
+//                if (sortOrder.isEmpty()){
+//                    sortOrder = CONTACT_NAME + " ASC";
+//                }
                 break;
             case URI_CONTACTS_ID:
                 Log.d(TAG, "query: URI_CONTACTS_ID");
@@ -228,6 +239,7 @@ public class MyContentProvider extends ContentProvider {
         }
 
     }
+
 }
 
 /*

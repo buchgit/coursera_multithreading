@@ -18,8 +18,11 @@
             </intent-filter>
         </activity>
         <provider
-                android:authorities="com.example.coursera_multithreading.provider.AddressBook"
-                android:name=".MyContentProvider"/>
+                android:authorities="com.example.coursera_multithreading.MyContentProvider"
+                android:name=".MyContentProvider"
+                android:enabled="true"
+        
+        />
     </application>
 
 </manifest>

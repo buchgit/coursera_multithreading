@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">coursera_multithreading</string>
-    <string name="start">Start</string>
-    <string name="cancel">Cancel</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">it\'s blank fragment</string>
-    <string name="message">message</string>
+    <string name="insert">Insert</string>
+    <string name="update">Update</string>
+    <string name="delete">Delete</string>
+    <string name="error">Error</string>
 </resources>
