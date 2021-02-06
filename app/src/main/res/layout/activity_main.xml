@@ -7,6 +7,15 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context=".MainActivity">
+    <org.lucasr.twowayview.TwoWayView
+            android:id="@+id/lvItems"
+            style="@style/TwoWayView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="false"
+            tools:context=".MainActivity" />
+    
+    
     <ImageView
             android:id="@+id/imv"
             android:layout_width="match_parent"
