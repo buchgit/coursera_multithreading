@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+
 /*
 RecyclerView может содержать в себе разные ViewHolder
  */
