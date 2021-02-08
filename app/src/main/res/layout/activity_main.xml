@@ -7,37 +7,10 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context=".MainActivity">
-    <org.lucasr.twowayview.TwoWayView
-            android:id="@+id/lvItems"
-            style="@style/TwoWayView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:drawSelectorOnTop="false"
-            tools:context=".MainActivity" />
-    
-    
-    <ImageView
-            android:id="@+id/imv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"/>
-    <Button
-            android:id="@+id/btn_start"
+
+    <FrameLayout
+            android:id="@+id/fr_main"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/start"
-            tools:ignore="MissingConstraints"/>
-    <Button
-            android:id="@+id/btn_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/cancel"
-            tools:ignore="MissingConstraints"/>
-    <ProgressBar
-            android:id="@+id/prb_main_activity"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:visibility="invisible"
-            tools:ignore="MissingConstraints"/>
+            android:layout_height="wrap_content"/>
 
 </LinearLayout>
