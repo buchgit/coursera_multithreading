@@ -3,9 +3,17 @@ package com.example.coursera_multithreading;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.collection.CircularArray;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class ListViewAdapter extends RecyclerView.Adapter{
+
+    private CircularArray<ListObject> mListObjects;
+
+    public void setmListObjects(CircularArray<ListObject> mListObjects) {
+        this.mListObjects = mListObjects;
+    }
+
     @NonNull
     @Override
     public ListObjectViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -14,12 +22,14 @@ public class ListViewAdapter extends RecyclerView.Adapter{
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        holder.bind(mListObjects.get(position));   //.bind  - нет такого метода
+        ListObjectViewHolder myHolder = (ListObjectViewHolder)holder;
+
+        myHolder.bind(mListObjects.get(position));
     }
 
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mListObjects.size();
     }
 }

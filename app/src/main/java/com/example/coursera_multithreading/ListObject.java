@@ -7,6 +7,11 @@ public class ListObject {
     private String text;
     private int icon;
 
+    public ListObject(String text, int icon) {
+        this.text = text;
+        this.icon = icon;
+    }
+
     public String getText() {
         return text;
     }
