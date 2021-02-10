@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-    
-    <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rec_view"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/refresher"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <FrameLayout
+            android:id="@+id/fr_in_refresher"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-</LinearLayout>
+            android:layout_height="match_parent">
+        
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rec_view"
+                android:layout_width="match_parent"
+                android:visibility="visible"
+                android:layout_height="match_parent"/>
+        
+        <include layout="@layout/error_view"
+                 android:visibility="gone"/>
+    </FrameLayout>
+
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

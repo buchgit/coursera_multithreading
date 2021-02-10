@@ -4,10 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 /*
-1. Добавить фрагмент
-2. Добавить адаптер
-3. Добавить холдер
-4. Добавить mock данные
 
  */
 
