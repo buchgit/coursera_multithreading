@@ -82,7 +82,7 @@ public class RecyclerFragment extends Fragment implements SwipeRefreshLayout.OnR
                 errorView.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
             }
-        }, 1000);//задержка
+        }, 1000); //задержка
 
     }
 }
