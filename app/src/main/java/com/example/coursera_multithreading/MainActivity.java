@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 /*
-read comments in RecyclerFragment.class
+two adapters, reading address book
  */
 
 public class MainActivity extends AppCompatActivity {
