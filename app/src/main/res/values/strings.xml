@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">coursera_multithreading</string>
+    <string name="app_name">coursera_multithreading address book</string>
     <string name="start">Start</string>
     <string name="cancel">Cancel</string>
     <string name="error_try_one_more_time">error, try one more time</string>

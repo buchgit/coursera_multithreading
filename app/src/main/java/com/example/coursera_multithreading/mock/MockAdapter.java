@@ -10,6 +10,10 @@ import com.example.coursera_multithreading.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+адаптер заработал нормально
+ */
+
 public class MockAdapter extends RecyclerView.Adapter<MockHolder> {
 
     private final List<Mock> mocks = new ArrayList<>();

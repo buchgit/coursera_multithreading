@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 /*
-
+read comments in RecyclerFragment.class
  */
 
 public class MainActivity extends AppCompatActivity {
