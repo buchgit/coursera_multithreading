@@ -1,13 +1,14 @@
 package com.example.coursera_multithreading;
 
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 /*
-two adapters, reading address book
+реализация нажатий на элементы RecyclerView
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ContactsAdapter.onItemClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +21,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onItemClick() {
+        Toast.makeText(this, "Обработка нажатий на элемент RecyclerView", Toast.LENGTH_SHORT).show();
+    }
 }
 
 

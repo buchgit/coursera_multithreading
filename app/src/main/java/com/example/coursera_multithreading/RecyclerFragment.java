@@ -1,5 +1,6 @@
 package com.example.coursera_multithreading;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -27,8 +28,8 @@ import java.util.Random;
 4. create any Adapter - class  (extends RecyclerView.Adapter in this sample) - ContactsAdapter
 5. in method onLoadFinished use this adapter (ContactsAdapter)
 6. ContactsAdapter in it's 3 methods add, bind data to any ViewHolder (MockHolder)
-7.
-8.
+7. Создаем лоадер, который имеет 3 метода
+8. Пишет механизм отработки нажатий на элементы RecyclerView. Используем интерфейс (ContactsAdapter.onItemClickListener), который создаем в адаптере (ContactsAdapter).
 9.
 
  */
@@ -41,9 +42,19 @@ public class RecyclerFragment extends Fragment implements SwipeRefreshLayout.OnR
     private SwipeRefreshLayout refreshLayout;
     private View errorView;
     private Random random = new Random();//для имитации ошибки
+    private ContactsAdapter.onItemClickListener onItemClickListener;
 
     public static RecyclerFragment newInstance() {
         return new RecyclerFragment();
+    }
+
+    //первый в жизненом цикле фрагмента
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof ContactsAdapter.onItemClickListener){
+            onItemClickListener = (ContactsAdapter.onItemClickListener)context;
+        }
     }
 
     @Nullable
@@ -67,7 +78,16 @@ public class RecyclerFragment extends Fragment implements SwipeRefreshLayout.OnR
         recyclerView.setAdapter(contactsAdapter);
         refreshLayout.setOnRefreshListener(this);//привязка обновлятора к активити
         //mockAdapter.addData(MockGenerator.generate(20));
+        contactsAdapter.setListener(onItemClickListener);
     }
+
+    @Override
+    public void onDetach() {
+        onItemClickListener = null;
+        super.onDetach();
+    }
+
+    //обработка нажатий на элементы
 
     @Override
     public void onRefresh() {
@@ -135,4 +155,5 @@ public class RecyclerFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onLoaderReset(@NonNull Loader loader) {
 
     }
+
 }

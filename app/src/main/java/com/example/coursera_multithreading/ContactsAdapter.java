@@ -17,6 +17,7 @@ import com.example.coursera_multithreading.mock.MockHolder;
 public class ContactsAdapter extends RecyclerView.Adapter<MockHolder> {
 
     private Cursor mCursor;
+    private onItemClickListener mlistener;
 
     @NonNull
     @Override
@@ -32,6 +33,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<MockHolder> {
             String name = mCursor.getString(mCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
             int id = mCursor.getInt(mCursor.getColumnIndex(ContactsContract.Contacts._ID));
             holder.bind(new Mock(name,id));
+            //передаем листенер в холдер
+            holder.setListener(mlistener);
         }
     }
 
@@ -46,5 +49,15 @@ public class ContactsAdapter extends RecyclerView.Adapter<MockHolder> {
             mCursor = cursor;
             notifyDataSetChanged(); //send message to system about changed data
         }
+    }
+
+    //ниже все, что относится к механизму обработки нажатий на элементы RecyclerView
+    public void setListener(onItemClickListener listener) {
+        mlistener = listener;
+    }
+
+    //реализацией этого интерфейса лучше делать на самом верху, т.е. в MainActivity
+    public interface onItemClickListener {
+        void onItemClick();
     }
 }

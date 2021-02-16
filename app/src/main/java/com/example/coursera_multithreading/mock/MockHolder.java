@@ -4,6 +4,7 @@ import android.view.View;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.example.coursera_multithreading.ContactsAdapter;
 import com.example.coursera_multithreading.R;
 
 public class MockHolder extends RecyclerView.ViewHolder {
@@ -20,5 +21,15 @@ public class MockHolder extends RecyclerView.ViewHolder {
     public void bind(Mock mock) {
         mName.setText(mock.getmName());
         mValue.setText(mock.getmValue());
+    }
+
+    public void setListener(final ContactsAdapter.onItemClickListener listener) {
+        //забавная хрень. itemView передается в конструктор, поэтому доступна и здесь.
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onItemClick(); //вызываем метод нашего листенера. Релизация в MainActivity
+            }
+        });
     }
 }
