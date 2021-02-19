@@ -53,7 +53,7 @@ public class RecyclerFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof ContactsAdapter.onItemClickListener){
-            onItemClickListener = (ContactsAdapter.onItemClickListener)context;
+            onItemClickListener = (ContactsAdapter.onItemClickListener)context;//context = MainActivity
         }
     }
 
@@ -136,7 +136,7 @@ public class RecyclerFragment extends Fragment implements SwipeRefreshLayout.OnR
         return new CursorLoader(
                 getActivity(), //context
                 ContactsContract.Contacts.CONTENT_URI, //ContentProvider
-                new String[] {ContactsContract.Contacts._ID,ContactsContract.Contacts.DISPLAY_NAME}, //column of query
+                new String[] {ContactsContract.Contacts._ID,ContactsContract.Contacts.DISPLAY_NAME}, //column of query //projections
                 null, //selection
                 null,//selection args
                 ContactsContract.Contacts._ID //sortOrder

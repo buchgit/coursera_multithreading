@@ -22,7 +22,6 @@ public class ContactsAdapter extends RecyclerView.Adapter<MockHolder> {
     @NonNull
     @Override
     public MockHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Context context;
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         return new MockHolder(inflater.inflate(R.layout.mock_holder,parent,false));
     }
@@ -53,11 +52,11 @@ public class ContactsAdapter extends RecyclerView.Adapter<MockHolder> {
 
     //ниже все, что относится к механизму обработки нажатий на элементы RecyclerView
     public void setListener(onItemClickListener listener) {
-        mlistener = listener;
+        mlistener = listener; //listener = MainActivity
     }
 
     //реализацией этого интерфейса лучше делать на самом верху, т.е. в MainActivity
     public interface onItemClickListener {
-        void onItemClick();
+        void onItemClick(String id);
     }
 }

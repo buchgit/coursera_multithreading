@@ -11,6 +11,7 @@ public class MockHolder extends RecyclerView.ViewHolder {
 
     private TextView mName;
     private TextView mValue;
+    private String mId;
 
     public MockHolder(@NonNull View itemView) {
         super(itemView);
@@ -21,6 +22,8 @@ public class MockHolder extends RecyclerView.ViewHolder {
     public void bind(Mock mock) {
         mName.setText(mock.getmName());
         mValue.setText(mock.getmValue());
+        mId = mock.getmValue();
+
     }
 
     public void setListener(final ContactsAdapter.onItemClickListener listener) {
@@ -28,7 +31,7 @@ public class MockHolder extends RecyclerView.ViewHolder {
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onItemClick(); //вызываем метод нашего листенера. Релизация в MainActivity
+                listener.onItemClick(mId); //вызываем метод нашего листенера. Релизация в MainActivity
             }
         });
     }
