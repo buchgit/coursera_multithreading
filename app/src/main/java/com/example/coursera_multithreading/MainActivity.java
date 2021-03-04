@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void deleteFile(boolean isExternal) {
         if (isExternal) {
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),FILENAME);
+            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), FILENAME);
             if (file.delete()) {
                 Toast.makeText(this, "deleted from external", Toast.LENGTH_SHORT).show();
             }
@@ -177,22 +177,22 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }else{
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_CODE);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
         }
 
     }
 
-    private boolean isPermissionGranted(){
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED;
+    private boolean isPermissionGranted() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode!=REQUEST_CODE)return;
-        if (grantResults.length!=1)return;
-        if (grantResults[0]==PackageManager.PERMISSION_GRANTED){
+        if (requestCode != REQUEST_CODE) return;
+        if (grantResults.length != 1) return;
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             String text = mText;
             saveToFile(text, mIsExternalSwitch.isChecked());
             updateTextViews();
