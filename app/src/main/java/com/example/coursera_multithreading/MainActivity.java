@@ -53,8 +53,6 @@ public class MainActivity extends AppCompatActivity {
                 String text = mInput.getText().toString();
                 writeToFile(text);
             }
-
-
         });
 
     }
