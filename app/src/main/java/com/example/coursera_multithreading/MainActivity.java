@@ -21,8 +21,6 @@ import java.io.*;
 1. В манифесте разрешение, но лучше использовать runtime permissions,
 2. Environment.getExternalStorageState() возвращает строку "mounted" - состояние внешнего хранилища
 3. EditText метод onEditorAction - обработчик ввода строки после нажания галки или enter
-4.
-5.
  */
 
 public class MainActivity extends AppCompatActivity {
