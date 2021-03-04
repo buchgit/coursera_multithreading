@@ -19,8 +19,8 @@ import java.io.*;
 
 /*
 1. В манифесте разрешение, но лучше использовать runtime permissions,
-2.
-3.
+2. Environment.getExternalStorageState() возвращает строку "mounted" - состояние внешнего хранилища
+3. EditText метод onEditorAction - обработчик ввода строки после нажания галки или enter
 4.
 5.
  */
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     private Switch mIsExternalSwitch;
     private Button mDelete;
+    private String mText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     String text = v.getText().toString();
+                    mText = text;
                     saveToFile(text, mIsExternalSwitch.isChecked());
                     updateTextViews();
                 }
@@ -71,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void deleteFile(boolean isExternal) {
         if (isExternal) {
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), FILENAME);
+            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),FILENAME);
             if (file.delete()) {
                 Toast.makeText(this, "deleted from external", Toast.LENGTH_SHORT).show();
             }
@@ -191,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode!=REQUEST_CODE)return;
         if (grantResults.length!=1)return;
         if (grantResults[0]==PackageManager.PERMISSION_GRANTED){
-            String text = v.getText().toString();
+            String text = mText;
             saveToFile(text, mIsExternalSwitch.isChecked());
             updateTextViews();
         }
