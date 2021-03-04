@@ -1,7 +1,6 @@
 package com.example.coursera_multithreading;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -58,23 +57,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void writeToFile(String text) {
-        if (TextUtils.isEmpty(text)){
-            Toast.makeText(this,"text is empty",Toast.LENGTH_SHORT).show();
-        }else{
+        if (TextUtils.isEmpty(text)) {
+            Toast.makeText(this, "text is empty", Toast.LENGTH_SHORT).show();
+        } else {
             writeFile(text);
         }
     }
 
     private void writeFile(String text) {
-        if (isPermissionGranted()){
+        if (isPermissionGranted()) {
             writeOk(text);
-        }else{
+        } else {
             requestWritePermissions();
         }
     }
 
     private boolean isPermissionGranted() {
-        return ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void requestWritePermissions() {
@@ -85,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                     .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_CODE);
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
                         }
                     }).show();
         } else {//делаем запрос на разрешение
@@ -94,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void writeOk(String text) {
-        Toast.makeText(this, text+ " - writing to file ...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, text + " - writing to file ...", Toast.LENGTH_SHORT).show();
     }
 
     //обработка ответа на запрос разрешения на запись во внешний файл
@@ -103,12 +102,12 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode != REQUEST_CODE) return;
         if (grantResults.length != 1) return;
-        if (grantResults[0]!=PackageManager.PERMISSION_GRANTED){//user does not give permission
+        if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {//user does not give permission
             new AlertDialog.Builder(this)
                     .setMessage("Вы отказали в разрешении на запись файла. Можете установить позже в настройках приложения.")
-                    .setPositiveButton("Понятно",null)
+                    .setPositiveButton("Понятно", null)
                     .show();
-        }else{//permission is granted
+        } else {//permission is granted
             String text = mInput.getText().toString();
             writeToFile(text);
         }
