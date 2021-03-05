@@ -37,5 +37,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="#00FF00" />
+    <Button
+            android:id="@+id/btn_save"
+            android:onClick="onClickInternal"
+            android:text="Save to file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    <Button
+            android:id="@+id/btn_read"
+            android:text="Read from file"
+            android:onClick="onClickInternal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    <Button
+            android:id="@+id/btn_save_ext"
+            android:text="Save external file"
+            android:onClick="onClickExternal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    <Button
+            android:id="@+id/btn_read_ext"
+            android:text="Read external file"
+            android:onClick="onClickExternal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    
 
 </LinearLayout>
