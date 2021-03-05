@@ -17,16 +17,13 @@ import androidx.core.content.ContextCompat;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-
 public class MainActivity extends AppCompatActivity {
 
-    public static final String FILENAME = "myfile";
-    public static final int REQUEST_CODE = 123;
+    public static final String FILENAME = "file";
     public static final int REQUEST_CODE1 = 123;
     private TextView mFromInternal;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     private Switch mIsExternalSwitch;
-    private String mText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                     requestForPermission();
                     return;
                 }
-                ;
+
                 writeToExternalFile();
                 break;
             case (R.id.btn_read_ext):
@@ -89,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                     requestForPermission();
                     return;
                 }
-                ;
+
                 readFromExternalFile(FILENAME);
                 break;
             default:
@@ -159,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
             requestForPermission();
             return;
         }
-        ;
+
         if (mIsExternalSwitch.isChecked()) {
             File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), FILENAME);
             if (file.delete()) {
