@@ -1,174 +1,154 @@
 package com.example.coursera_multithreading;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.*;
+import android.content.*;
 import android.content.pm.PackageManager;
-import android.os.Bundle;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Environment;
 import android.view.View;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import java.util.ArrayList;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+/*
+1. DownloadManager  getSystemService(Context.DOWNLOAD_SERVICE)
+2. register receiver (new BroadcastReceiver(),new IntentFilter(...))
+3. new DownloadManager.Request
+4. NotificationCompat.Builder + NotificationManager
+ */
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String FILENAME = "file";
-    public static final int REQUEST_CODE1 = 123;
-    private TextView mFromInternal;
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
-    private Switch mIsExternalSwitch;
+    public static final int WRITE_EXTERNAL_FILES = 123;
+    private Button button2;
+    private EditText editText;
+    private BroadcastReceiver broadcastReceiver;
+    private String downloadSubPath;
+    private DownloadManager downloadManager;
+    private final ArrayList<Long> listOfRef = new ArrayList<>();
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initUI();
+        imageView = findViewById(R.id.iv_main);
 
-    }
+        button2 = findViewById(R.id.btn2_main);
+        button2.setEnabled(false);
 
-    private void initUI() {
-        mFromInternal = findViewById(R.id.tv_from_internal_file);
-        mIsExternalSwitch = findViewById(R.id.switch_is_external);
-    }
+        editText = findViewById(R.id.et_main);
+        //for example
+        editText.setText("http://www.gadgetsaint.com/wp-content/uploads/2016/11/cropped-web_hi_res_512.png");
+        //1
+        downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        //2
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Long refId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+                listOfRef.remove(refId);
+                if (listOfRef.isEmpty()) {
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this);
+                    builder.setContentTitle("load file...")
+                            .setSmallIcon(R.drawable.ic_launcher_foreground)
+                            .setContentText("*>*>*>*>");
 
-    public void onClickInternal(View view) throws IOException {
-        switch (view.getId()) {
-            case (R.id.btn_save):
-                String text = "this is the text for internal file";
-                String textIntoFile = text + "\n";
-                FileOutputStream outputStream = openFileOutput(FILENAME, MODE_APPEND);
-                outputStream.write(textIntoFile.getBytes(StandardCharsets.UTF_8));
-                outputStream.close();
-                Toast.makeText(this, "file" + FILENAME + " is written", Toast.LENGTH_SHORT).show();
-                break;
-            case (R.id.btn_read):
-                FileInputStream inputStream = openFileInput(FILENAME);
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                String s;
-                StringBuilder stringBuilder = new StringBuilder();
-                while ((s = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(s).append("#" + "\t");
+                    NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    manager.notify(455, builder.build());
+
+                    button2.setEnabled(true);
                 }
-                mFromInternal.setText(stringBuilder.toString());
-                break;
-            default:
-                break;
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+
+        registerReceiver(broadcastReceiver, intentFilter);
+        //3
+        downloadSubPath = "/Downloads/sample.png";
+
+    }
+
+    private void downloadFile() {
+        String stringUri = editText.getText().toString();
+        if (!stringUri.isEmpty() && (stringUri.contains(".bmp") || stringUri.contains(".jpeg") || stringUri.contains(".png"))) {
+            Uri downloadUri = Uri.parse(stringUri);
+
+            DownloadManager.Request request = new DownloadManager.Request(downloadUri);
+            request.setTitle("Download pictures")
+                    .setDescription("-Test downloading-")
+                    .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI)
+                    .setAllowedOverRoaming(false)
+                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+                    .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, downloadSubPath);
+
+            long referenceId = downloadManager.enqueue(request);
+            listOfRef.add(referenceId);
+
         }
     }
 
-    public void onClickExternal(View view) throws IOException {
-
-        String ext_mounted = Environment.getExternalStorageState();
-        if (!ext_mounted.equals(Environment.MEDIA_MOUNTED)) {
-            Toast.makeText(this, "Нет внешних накопителей", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+    public void onClick(View view) {
         switch (view.getId()) {
-            case (R.id.btn_save_ext):
-                if (!isPermissionGranted()) {
+            case R.id.btn1_main:
+                if (isPermissionGranted()) {
+                    downloadFile();
+                } else {
                     requestForPermission();
                     return;
                 }
-
-                writeToExternalFile();
                 break;
-            case (R.id.btn_read_ext):
-                if (!isPermissionGranted()) {
-                    requestForPermission();
-                    return;
-                }
-
-                readFromExternalFile(FILENAME);
-                break;
-            default:
+            case R.id.btn2_main:
+                imageView.setImageDrawable(Drawable.createFromPath(Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+Environment.DIRECTORY_DOWNLOADS+downloadSubPath));
                 break;
         }
     }
 
-    private void writeToExternalFile() throws IOException {
-
-        File file = new File(Environment.getExternalStorageDirectory(), FILENAME);
-        FileOutputStream outputStream = new FileOutputStream(file, true);
-
-        String text = "this is the text for external file" + System.currentTimeMillis();
-        String textIntoFile = text + "\n";
-
-        outputStream.write(textIntoFile.getBytes(StandardCharsets.UTF_8));
-        Toast.makeText(this, "is written to external file", Toast.LENGTH_SHORT).show();
-    }
-
-    private void readFromExternalFile(String filename) throws IOException {
-        String path = Environment.getExternalStorageDirectory().getPath();
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "/" + filename));
-        String s;
-        StringBuilder builder = new StringBuilder();
-        while ((s = bufferedReader.readLine()) != null) {
-            builder.append(s).append("\n");
-        }
-        mFromInternal.setText(builder.toString());
-    }
-
-    public void requestForPermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+    private void requestForPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             new AlertDialog.Builder(this)
-                    .setMessage("Необходимо разрешение для записи файлов на внешний носитель")
-                    .setPositiveButton("Разрешить", new DialogInterface.OnClickListener() {
+                    .setMessage("Разрешение необходимо для записи во внешний файл.")
+                    .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE1);
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_FILES);
                         }
-                    })
-                    .show();
+                    }).show();
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE1);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_FILES);
         }
-    }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode != REQUEST_CODE1) return;
-        if (grantResults.length != 1) return;
-        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            try {
-                writeToExternalFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private boolean isPermissionGranted() {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
-    public void onDelete(View view) {
-        if (!isPermissionGranted()) {
-            requestForPermission();
-            return;
-        }
-
-        if (mIsExternalSwitch.isChecked()) {
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), FILENAME);
-            if (file.delete()) {
-                Toast.makeText(this, "external file is deleted", Toast.LENGTH_SHORT).show();
-            }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode != WRITE_EXTERNAL_FILES) return;
+        if (grantResults.length != 1) return;
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            downloadFile();
         } else {
-            if (deleteFile(FILENAME)) {
-                Toast.makeText(this, "internal file is deleted", Toast.LENGTH_SHORT).show();
-            }
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(broadcastReceiver);
+    }
 }
-
-
 
