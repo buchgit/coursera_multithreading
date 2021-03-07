@@ -5,14 +5,14 @@ import android.os.PersistableBundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
+import com.example.coursera_multithreading.database.DataBase;
 
 /* room
-1. build.gradle app
-    implementation 'android.arch.persistence.room:runtime:1.1.1'
-    annotationProcessor 'android.arch.persistence.room:compiler:1.1.1'
+1. build.gradle app (dependencies)
 2. Room.databaseBuilder
 3. @Entity, @Database, @Dao
-4.
+4. Также можно создать inMemoryDatabase - базу, которая существует до тех пор, пока процесс не будет уничтожен. Работает как кеш
+5.
  */
 
 public class MainActivity extends AppCompatActivity {
@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState, persistentState);
         setContentView(R.layout.activity_main);
 
-        DataBase  mDatabase = Room.databaseBuilder(getApplicationContext(), DataBase.class, "music_database") // название файла
+        DataBase mDatabase = Room.databaseBuilder(getApplicationContext(), DataBase.class, "music_database") // название файла
                 .fallbackToDestructiveMigration()  // дешевый способ миграции на новую версию
                 .build();
     }
