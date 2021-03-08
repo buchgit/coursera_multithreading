@@ -6,6 +6,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context=".MainActivity">
-
-
+    
+    <Button
+            android:id="@+id/btn_get"
+            android:layout_width="match_parent"
+            android:text="@string/get"
+            android:onClick="onClick"
+            android:layout_height="wrap_content"/>
+    
 </LinearLayout>
