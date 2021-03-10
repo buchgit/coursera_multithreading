@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         musicDao = dataBase.getMusicDao();
 
-        musicDao.insertAlbum(getAlbumList());
+        musicDao.insertAlbums(getAlbumList());
 
     }
 
