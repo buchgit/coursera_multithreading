@@ -88,30 +88,27 @@ public class MusicContentProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        switch (matcher.match(uri)){
-            case ITEM_ALBUM_CODE:
-                return musicDao.deleteAlbum((int)ContentUris.parseId(uri));
-            default:throw new UnsupportedOperationException("Not yet implemented");
+        if (matcher.match(uri) == ITEM_ALBUM_CODE) {
+            return musicDao.deleteAlbum((int) ContentUris.parseId(uri));
         }
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     //не доделано
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        switch (matcher.match(uri)){
-            case ITEM_ALBUM_CODE:
-                return uri;
-            default:throw new UnsupportedOperationException("Not yet implemented");
+        if (matcher.match(uri) == ITEM_ALBUM_CODE) {
+            return uri;
         }
+        throw new UnsupportedOperationException("Not yet implemented");
     }
     //не доделано
     @Override
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
-        switch (matcher.match(uri)){
-            case ITEM_ALBUM_CODE:
-                return 0;
-            default:throw new UnsupportedOperationException("Not yet implemented");
+        if (matcher.match(uri) == ITEM_ALBUM_CODE) {
+            return 0;
         }
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }
